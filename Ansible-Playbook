@@ -1,0 +1,49 @@
+---
+- hosts: meraki_servers
+  vars:
+    org_id: "123123123"
+    corp_name: "ABC Corp"
+  gather_facts: false
+  tasks:
+
+    - name: Get Organization Networks
+      cisco.meraki.networks_info:
+        organizationId: "{{org_id }}"
+      register: result
+
+    - name: Filter networks with "wireless" productTypes
+      set_fact:
+        filtered_networks: :{{ result.meraki_response | selectattr('productTypes', 'contains', 'wire
+
+- name: Creat corporate SSID
+  cisco.meraki.networks_wireless_ssids:
+    state: present
+    enabled: true
+    name: "{{ corp_name }}"
+    networkId: "{{ item.id }}
+    number: 1
+    ipAssignmentMode: Bridge mode
+    defaultVlanId: 100
+    useVlanTagging: true
+    authMode: "8021x-redius"
+    radiusServers:
+      - one:
+        host:"1.2.3.4"
+        port: 1812
+        secret: SuperSecretPassword
+   loop: "{{ filtered_networks }}"
+   loop_control:
+     label: "{{ item.id }}"
+
+- name: Creat Guest SSID
+  cisco.meraki.networks_wireless_ssids:
+    state: present
+    enabled: true
+    name: "{{ corp_name }}-Guests"
+    networkId: "{{ item.id }}"
+    number: 3
+    ipAssignmentMode: Bridge mode
+    defaultVlanId: 300
+    useVlanTagging: true
+    authMode: "open"
+    splashPage: Clock-through splash page
