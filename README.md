@@ -1,4 +1,4 @@
-# Network-Automation-With-My-Home-Network-
+# Automating-My-Home-Network-
 automating my home network using Ansible, Playbooks, and YAML
 <h1>Network Automation Lab</h1>
 
